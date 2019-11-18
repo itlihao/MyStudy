@@ -1,0 +1,68 @@
+apply plugin: 'com.android.application'
+
+def baseConfig = rootProject.ext
+
+android {
+    compileSdkVersion baseConfig["compileSdkVersion"]
+    buildToolsVersion "29.0.0"
+
+
+    defaultConfig {
+        applicationId "com.lia.inject"
+        minSdkVersion baseConfig["minSdkVersion"]
+        targetSdkVersion baseConfig["targetSdkVersion"]
+        versionCode baseConfig["versionCode"]
+        versionName baseConfig["versionName"]
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def keyStorePath_ = properties.getProperty("key.keyStorePath")
+        def storePassword_ = properties.getProperty("key.storePassword")
+        def keyAlias_ = properties.getProperty("key.keyAlias")
+        def keyPassword_ = properties.getProperty("key.keyPassword")
+        def storeFile_ = file(keyStorePath_)
+
+        release {
+            storeFile storeFile_
+            storePassword storePassword_
+            keyAlias keyAlias_
+            keyPassword keyPassword_
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+        debug {
+            storeFile storeFile_
+            storePassword storePassword_
+            keyAlias keyAlias_
+            keyPassword keyPassword_
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api 'com.android.support:appcompat-v7:28.0.0'
+
+}
